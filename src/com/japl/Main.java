@@ -24,6 +24,7 @@ public class Main {
         Japl.Print("好");
         Japl.Print("世");
         Japl.Print("界");
+        Japl.Println("你好世界！！");
         /*
         getCid("BV1U7411x7EX");
         getCid("BV1B64y1c7ta");
