@@ -1,0 +1,12 @@
+<component name="ArtifactManager">
+  <artifact name="哔哩哔哩视频下载:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/_jar</output-path>
+    <root id="root">
+      <element id="archive" name="哔哩哔哩视频下载.jar">
+        <element id="module-output" name="哔哩哔哩视频下载" />
+      </element>
+      <element id="library" level="project" name="jsoup-1.13.1" />
+      <element id="library" level="project" name="json-20180813" />
+    </root>
+  </artifact>
+</component>

@@ -25,6 +25,7 @@ public class Japl {
     "青蓝色", "96"
     "白色", "97"
 */
+    protected static final String ffmpegPath="A:/ffmpeg/bin/ffmpeg.exe ";
     public static boolean Download(String Url,String path){
         try {
             URL url=new URL(Url);
@@ -45,11 +46,16 @@ public class Japl {
             InputStream is = connection.getInputStream();
             FileOutputStream out =new FileOutputStream(path);
 
+            long len = connection.getContentLengthLong();
+
             int lenght;
             byte[] buffer =new byte[1024];
+            int x=0;
             while((lenght=is.read(buffer))!=-1) {
+                x+=lenght;
                 out.write(buffer,0,lenght);
                 out.flush();
+                System.out.println("总大小："+len+" 已下载："+x);
             }
             is.close();
             out.close();
@@ -140,7 +146,7 @@ public class Japl {
             }
             is.close();
             message.close();
-            return new String(message.toByteArray());
+            return new String(message.toByteArray(), StandardCharsets.UTF_8);
 
         }catch (IOException e) {
             e.printStackTrace();
@@ -153,7 +159,8 @@ public class Japl {
 
         String str="ICAgICAgICAgICAgICAgICAgICAgLy8KICAgICAgICAgXFwgICAgICAgICAvLwogICAgICAgICAgXFwgICAgICAgLy8KICAgICMjRERERERERERERERERERERERERERERCMjCiAgICAjIyBERERERERERERERERERERERERERCAjIyAgIF9fX19fX19fICAgX19fICAgX19fICAgICAgICBfX18gICBfX19fX19fXyAgIF9fXyAgIF9fXyAgICAgICAgX19fCiAgICAjIyBoaCAgICAgICAgICAgICAgICBoaCAjIyAgIHxcICAgX18gIFwgfFwgIFwgfFwgIFwgICAgICB8XCAgXCB8XCAgIF9fICBcIHxcICBcIHxcICBcICAgICAgfFwgIFwKICAgICMjIGhoICAgIC8vICAgIFxcICAgIGhoICMjICAgXCBcICBcfFwgL19cIFwgIFxcIFwgIFwgICAgIFwgXCAgXFwgXCAgXHxcIC9fXCBcICBcXCBcICBcICAgICBcIFwgIFwKICAgICMjIGhoICAgLy8gICAgICBcXCAgIGhoICMjICAgIFwgXCAgIF9fICBcXCBcICBcXCBcICBcICAgICBcIFwgIFxcIFwgICBfXyAgXFwgXCAgXFwgXCAgXCAgICAgXCBcICBcCiAgICAjIyBoaCAgICAgICAgICAgICAgICBoaCAjIyAgICAgXCBcICBcfFwgIFxcIFwgIFxcIFwgIFxfX19fIFwgXCAgXFwgXCAgXHxcICBcXCBcICBcXCBcICBcX19fXyBcIFwgIFwKICAgICMjIGhoICAgICAgd3d3dyAgICAgIGhoICMjICAgICAgXCBcX19fX19fX1xcIFxfX1xcIFxfX19fX19fXFwgXF9fXFwgXF9fX19fX19cXCBcX19cXCBcX19fX19fX1xcIFxfX1wKICAgICMjIGhoICAgICAgICAgICAgICAgIGhoICMjICAgICAgIFx8X19fX19fX3wgXHxfX3wgXHxfX19fX19ffCBcfF9ffCBcfF9fX19fX198IFx8X198IFx8X19fX19fX3wgXHxfX3wKICAgICMjIE1NTU1NTU1NTU1NTU1NTU1NTU1NICMjCiAgICAjI01NTU1NTU1NTU1NTU1NTU1NTU1NTU0jIwogICAgICAgICBcLyAgICAgICAgICAgIFwv";
         byte[] decoded = Base64.getDecoder().decode(str);
-        System.out.println("\033[41;97;1m" + new String(decoded) + "\n\033[0m");
+        //System.out.println("\033[41;97;1m" + new String(decoded) + "\n\033[0m");
+        System.out.println(new String(decoded));
     }
     public static int Random(int s,int d){
         return (int)(Math.random()*(d-s)+s);
@@ -300,6 +307,45 @@ public class Japl {
         }else{
             //默认 随机一种颜色
             System.out.println("\033["+Random(90,97)+";1m" + str + "\033[0m");
+        }
+    }
+    //视频合并
+    public static String Video_Audio(String videoInputPath, String audioInputPath, String videoOutPath){
+        // ffmpeg命令
+        String command = "-i " + videoInputPath + " -i " + audioInputPath
+                + " -c:v copy -c:a aac -strict experimental " +
+                " -map 0:v:0 -map 1:a:0 "
+                + " -y " + videoOutPath;
+        return command;
+    }
+    public static void Convetor(String command) throws Exception {
+        Process process;
+        InputStream errorStream = null;
+        InputStreamReader inputStreamReader = null;
+        BufferedReader br = null;
+        try {
+            process = Runtime.getRuntime().exec(ffmpegPath+command);
+            errorStream = process.getErrorStream();
+            inputStreamReader = new InputStreamReader(errorStream, StandardCharsets.UTF_8);
+            br = new BufferedReader(inputStreamReader);
+            // 用来收集错误信息的
+            String str;
+            while ((str = br.readLine()) != null) {
+                System.out.println(str);
+            }
+            process.waitFor();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (br != null) {
+                br.close();
+            }
+            if (inputStreamReader != null) {
+                inputStreamReader.close();
+            }
+            if (errorStream != null) {
+                errorStream.close();
+            }
         }
     }
 }
